@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RapidMeta Cardiology | Sotatercept in PAH v13.0</title>
+    <title>RapidMeta Cardiology | Sotatercept in PAH v14.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.plot.ly https://webr.r-wasm.org; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://clinicaltrials.gov https://www.ebi.ac.uk https://api.openalex.org https://webr.r-wasm.org https://repo.r-wasm.org http://localhost:* http://127.0.0.1:*; worker-src 'self' blob:; img-src 'self' data: blob:;">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23020617'/%3E%3Cpath d='M18 18h12c8 0 14 6 14 14s-6 14-14 14H18V18zm10 22c5 0 8-3 8-8s-3-8-8-8h-2v16h2z' fill='%233b82f6'/%3E%3Cpath d='M40 18h6v28h-6z' fill='%23f8fafc'/%3E%3C/svg%3E">
@@ -174,6 +174,23 @@
         .diff-snapshot-card.baseline { border-left-color: #64748b; }
         .diff-snapshot-card.material { border-left-color: #f59e0b; }
         .light-mode .diff-snapshot-card { background: rgba(241,245,249,0.6); }
+        /* v14.0: Network Meta-Analysis */
+        .nma-network-container { height: 400px; width: 100%; border-radius: 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); }
+        .light-mode .nma-network-container { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.05); }
+        .nma-league { width: 100%; border-collapse: collapse; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; }
+        .nma-league th, .nma-league td { padding: 0.5rem; text-align: center; border: 1px solid #1e293b; }
+        .nma-league th { background: #0f172a; color: #94a3b8; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .nma-league td.nma-sig-favor { background: rgba(34,197,94,0.12); color: #4ade80; }
+        .nma-league td.nma-sig-against { background: rgba(239,68,68,0.12); color: #f87171; }
+        .nma-league td.nma-ns { color: #94a3b8; }
+        .nma-league td.nma-diag { background: #0f172a; color: #60a5fa; font-weight: 700; font-size: 0.65rem; }
+        .nma-rank-bar { height: 24px; border-radius: 4px; display: inline-block; min-width: 4px; transition: width 0.3s; }
+        .nma-consistency-pass { color: #4ade80; }
+        .nma-consistency-fail { color: #f87171; font-weight: 700; }
+        .light-mode .nma-league th { background: #f1f5f9; color: #475569; }
+        .light-mode .nma-league td { border-color: #e2e8f0; }
+        .light-mode .nma-league td.nma-diag { background: #f1f5f9; }
+        .light-mode .nma-network-container { background: rgba(241,245,249,0.5); }
         .prov-progress { height: 4px; border-radius: 999px; overflow: hidden; background: rgba(30,41,59,0.7); margin-top: 0.35rem; }
         .prov-progress > span { display: block; height: 100%; background: linear-gradient(90deg, #64748b, #eab308, #22c55e); transition: width 0.3s; }
         .prov-popover[role="dialog"] { outline: none; }
@@ -400,7 +417,7 @@
     <header class="h-14 border-b border-slate-800 bg-slate-950 flex items-center justify-between px-6 shrink-0">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">R</div>
-            <h1 class="font-bold text-lg tracking-tight text-white">RapidMeta <span class="text-blue-400 font-normal text-sm ml-1">Precision v13.0</span></h1>
+            <h1 class="font-bold text-lg tracking-tight text-white">RapidMeta <span class="text-blue-400 font-normal text-sm ml-1">Precision v14.0</span></h1>
         </div>
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-1 bg-slate-900 rounded-xl p-1 border border-slate-800" role="radiogroup" aria-label="Confidence level">
@@ -456,6 +473,7 @@
         <button onclick="RapidMeta.switchTab('extract')" class="tab-btn h-full text-sm font-medium text-slate-400 hover:text-white transition-all duration-200 border-b-2 border-transparent" data-tab="extract" role="tab" aria-selected="false" aria-controls="tab-extract" id="btn-tab-extract">4. Extraction</button>
         <button onclick="RapidMeta.switchTab('analysis')" class="tab-btn h-full text-sm font-medium text-slate-400 hover:text-white transition-all duration-200 border-b-2 border-transparent" data-tab="analysis" role="tab" aria-selected="false" aria-controls="tab-analysis" id="btn-tab-analysis">5. Analysis Suite</button>
         <button onclick="RapidMeta.switchTab('report')" class="tab-btn h-full text-sm font-medium text-purple-400 hover:text-purple-300 transition-all duration-200 border-b-2 border-transparent" data-tab="report" role="tab" aria-selected="false" aria-controls="tab-report" id="btn-tab-report">6. Scientific Output</button>
+        <button onclick="RapidMeta.switchTab('nma')" class="tab-btn h-full text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-all duration-200 border-b-2 border-transparent" data-tab="nma" role="tab" aria-selected="false" aria-controls="tab-nma" id="btn-tab-nma" style="display:none">7. NMA</button>
     </nav>
 
     <!-- Stale Detection Banner (Task 8: D4) -->
@@ -480,7 +498,7 @@
                     <div class="bg-slate-900/80 p-4 border-b border-slate-800"><h3 class="text-xs font-bold uppercase text-blue-400 tracking-widest"><i class="fa-solid fa-id-card mr-2"></i>1. Registration &amp; Administrative Information <span class="text-slate-500 ml-2">[PRISMA #24, AMSTAR #2]</span></h3></div>
                     <table class="w-full text-left text-xs"><tbody class="divide-y divide-slate-800/50">
                         <tr><td class="p-4 w-1/4 font-bold text-slate-400">Review Title</td><td class="p-4 text-slate-300">Sotatercept for Pulmonary Arterial Hypertension: A Living Systematic Review and Meta-Analysis</td></tr>
-                        <tr><td class="p-4 font-bold text-slate-400">Protocol Version</td><td class="p-4 text-slate-300">v13.0 (Living Protocol &mdash; auto-updating)</td></tr>
+                        <tr><td class="p-4 font-bold text-slate-400">Protocol Version</td><td class="p-4 text-slate-300">v14.0 (Living Protocol &mdash; auto-updating)</td></tr>
                         <tr><td class="p-4 font-bold text-slate-400">Protocol Freeze Date</td><td class="p-4 text-slate-300"><span id="proto-reg-date">2026-03-10</span></td></tr>
                         <tr><td class="p-4 font-bold text-slate-400">Last Substantive Amendment</td><td class="p-4 text-slate-300"><span id="proto-amend-date">2026-03-10</span></td></tr>
                         <tr><td class="p-4 font-bold text-slate-400">Planned Update Frequency</td><td class="p-4 text-slate-300">Continuous (living review); formal snapshot at each new trial publication</td></tr>
@@ -1444,6 +1462,44 @@
                 </div>
             </div>
         </section>
+                <!-- v14.0: NMA Tab (only visible when nma_network is configured) -->
+                <section id="tab-nma" class="tab-content h-full p-8 overflow-y-auto hidden" role="tabpanel" aria-labelledby="btn-tab-nma">
+                    <div class="max-w-6xl mx-auto space-y-10">
+                        <div class="text-center mb-10">
+                            <h2 class="text-3xl font-bold tracking-tight">Network Meta-Analysis</h2>
+                            <p class="opacity-50 text-sm mt-2">Indirect comparisons via connected treatment network</p>
+                        </div>
+
+                        <div class="glass p-10 rounded-[40px] border border-slate-800">
+                            <h3 class="text-sm font-bold opacity-60 uppercase tracking-[0.3em] mb-6">Treatment Network</h3>
+                            <div id="nma-network-plot" class="nma-network-container"></div>
+                            <div class="text-[9px] text-slate-500 mt-2">Nodes = treatments (sized by total N). Edges = direct trial comparisons. Dashed = indirect only.</div>
+                        </div>
+
+                        <div class="glass p-10 rounded-[40px] border border-slate-800">
+                            <h3 class="text-sm font-bold opacity-60 uppercase tracking-[0.3em] mb-6">League Table (All Pairwise Comparisons)</h3>
+                            <div id="nma-league-container" class="overflow-x-auto"></div>
+                            <div class="text-[9px] text-slate-500 mt-2">Upper triangle: effect estimates with 95% CI. Green = significantly favors row. Red = favors column. Gray = non-significant.</div>
+                        </div>
+
+                        <div class="glass p-10 rounded-[40px] border border-slate-800">
+                            <h3 class="text-sm font-bold opacity-60 uppercase tracking-[0.3em] mb-6">Treatment Rankings (P-Score)</h3>
+                            <div id="nma-ranking-container"></div>
+                            <div class="text-[9px] text-amber-400 mt-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i>SUCRA/P-score measures ranking probability, NOT effect magnitude. Always interpret alongside the league table effect estimates.</div>
+                        </div>
+
+                        <div class="glass p-10 rounded-[40px] border border-slate-800">
+                            <h3 class="text-sm font-bold opacity-60 uppercase tracking-[0.3em] mb-6">Consistency Assessment (Node-Splitting)</h3>
+                            <div id="nma-consistency-container"></div>
+                            <div class="text-[9px] text-slate-500 mt-2">Compares direct vs indirect evidence for each comparison. P &lt; 0.10 suggests inconsistency.</div>
+                        </div>
+
+                        <div class="flex gap-3 justify-center">
+                            <button type="button" onclick="NMAEngine.render()" class="text-[11px] font-bold text-blue-400 uppercase bg-blue-400/10 px-6 py-3 rounded-full border border-blue-400/20 transition-all hover:bg-blue-400/20"><i class="fa-solid fa-diagram-project mr-2"></i>Run NMA</button>
+                            <button type="button" onclick="NMAEngine.exportLeagueCSV()" class="text-[11px] px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700"><i class="fa-solid fa-download mr-1"></i>Export League Table</button>
+                        </div>
+                    </div>
+                </section>
     </main>
 
     <script>
@@ -2321,28 +2377,30 @@
                 },
                 'NCT04811092': {
                     name: 'HYPERION', phase: 'III', year: 2025,
-                    tE: 14, tN: 161, cE: 47, cN: 160, group: 'Newly diagnosed PAH (intermediate-high risk)',
+                    tE: 17, tN: 160, cE: 59, cN: 160, group: 'Newly diagnosed PAH (intermediate-high risk)',
+                    publishedHR: 0.24, hrLCI: 0.13, hrUCI: 0.43,
                     allOutcomes: [
-                        { shortLabel: 'Clinical Worsening', title: 'Time to first clinical worsening event (all-cause death, PAH hospitalization, lung transplant, 6MWD deterioration + WHO FC worsening, rescue therapy) -- primary', tE: 14, cE: 47, type: 'PRIMARY' },
+                        { shortLabel: 'Clinical Worsening', title: 'Time to first clinical worsening event (all-cause death, PAH hospitalization, lung transplant, 6MWD deterioration + WHO FC worsening, rescue therapy) -- primary', tE: 17, cE: 59, type: 'PRIMARY', pubHR: 0.24, pubHR_LCI: 0.13, pubHR_UCI: 0.43 },
                         { shortLabel: '6MWD Change', title: 'Change from baseline in 6MWD at Week 24', tE: 0, cE: 0, type: 'SECONDARY' },
                         { shortLabel: 'WHO FC Improvement', title: 'Proportion improving in WHO FC or maintaining FC II at Week 24', tE: 0, cE: 0, type: 'SECONDARY' },
                         { shortLabel: 'NT-proBNP Change', title: 'Change from baseline in NT-proBNP at Week 24', tE: 0, cE: 0, type: 'SECONDARY' },
                         { shortLabel: 'REVEAL Lite 2 Low Risk', title: 'Proportion achieving low REVEAL Lite 2 risk score at Week 24', tE: 0, cE: 0, type: 'SECONDARY' }
                     ],
                     rob: ['low', 'low', 'low', 'low', 'low'],
-                    snippet: 'Source: ClinicalTrials.gov NCT04811092 (HYPERION). Enrollment: 321. Status: COMPLETED. Phase 3. Newly diagnosed intermediate/high-risk PAH on double/triple combo therapy.',
+                    snippet: 'Source: ClinicalTrials.gov NCT04811092 (HYPERION). Enrollment: 320. Status: COMPLETED. Phase 3. Newly diagnosed intermediate/high-risk PAH on double/triple combo therapy. HR 0.24 (0.13-0.43).',
                     sourceUrl: 'https://clinicaltrials.gov/study/NCT04811092',
                     evidence: [
-                        { label: 'Enrollment & Design', source: 'ClinicalTrials.gov NCT04811092 (HYPERION)', text: '321 newly diagnosed PAH patients (within 12 months) at intermediate-to-high risk (REVEAL Lite 2 >=6 or COMPERA 2.0 >=2) on stable double/triple background PAH therapy randomized 1:1 to sotatercept + background vs placebo + background. WHO FC II/III.', highlights: ['321', '1:1', 'newly diagnosed', 'intermediate-to-high risk'] },
-                        { label: 'Primary Outcome (Time to Clinical Worsening)', source: 'ClinicalTrials.gov NCT04811092; HYPERION results 2025', text: 'Time to first clinical worsening event: sotatercept 14/161 (8.7%) vs placebo 47/160 (29.4%). HR 0.28 (95% CI 0.15-0.51; P<0.001). Event reduction 72%. Median follow-up ~24 months.', highlights: ['14', '161', '8.7%', '47', '160', '29.4%', 'HR 0.28', 'P<0.001'] },
+                        { label: 'Enrollment & Design', source: 'ClinicalTrials.gov NCT04811092 (HYPERION)', text: '320 newly diagnosed PAH patients (within 12 months) at intermediate-to-high risk (REVEAL Lite 2 >=6 or COMPERA 2.0 >=2) on stable double/triple background PAH therapy randomized 1:1 to sotatercept + background (n=160) vs placebo + background (n=160). WHO FC II/III.', highlights: ['320', '160', '160', '1:1', 'newly diagnosed', 'intermediate-to-high risk'] },
+                        { label: 'Primary Outcome (Time to Clinical Worsening)', source: 'ClinicalTrials.gov NCT04811092; HYPERION results 2025', text: 'Time to first clinical worsening event: sotatercept 17/160 (10.6%) vs placebo 59/160 (36.9%). HR 0.24 (95% CI 0.13-0.43; P<0.001). Event reduction 76%. Median follow-up ~24 months.', highlights: ['17', '160', '10.6%', '59', '160', '36.9%', 'HR 0.24', 'P<0.001'] },
                         { label: 'Key Secondaries', source: 'ClinicalTrials.gov NCT04811092; HYPERION results 2025', text: 'In newly diagnosed intermediate-high risk PAH, sotatercept showed superiority in all hierarchical secondary endpoints including 6MWD, WHO FC, NT-proBNP, and risk score improvements at Week 24. Confirms benefit in treatment-naive population on upfront combination therapy.', highlights: ['newly diagnosed', 'hierarchical secondary', 'superiority'] }
                     ]
                 },
                 'NCT04896008': {
                     name: 'ZENITH', phase: 'III', year: 2024,
-                    tE: 13, tN: 87, cE: 33, cN: 86, group: 'High-risk PAH (WHO FC III/IV)',
+                    tE: 15, tN: 86, cE: 47, cN: 86, group: 'High-risk PAH (WHO FC III/IV)',
+                    publishedHR: 0.24, hrLCI: 0.13, hrUCI: 0.45,
                     allOutcomes: [
-                        { shortLabel: 'Morbidity/Mortality', title: 'Time to first confirmed morbidity or mortality event (all-cause death, lung transplant, PAH-related hospitalization >=24h) -- primary', tE: 13, cE: 33, type: 'PRIMARY' },
+                        { shortLabel: 'Morbidity/Mortality', title: 'Time to first confirmed morbidity or mortality event (all-cause death, lung transplant, PAH-related hospitalization >=24h) -- primary', tE: 15, cE: 47, type: 'PRIMARY', pubHR: 0.24, pubHR_LCI: 0.13, pubHR_UCI: 0.45 },
                         { shortLabel: 'Overall Survival', title: 'Overall survival (all-cause death)', tE: 5, cE: 15, type: 'SECONDARY' },
                         { shortLabel: 'Transplant-free Survival', title: 'Transplant-free survival (lung transplant or all-cause death)', tE: 6, cE: 17, type: 'SECONDARY' },
                         { shortLabel: '6MWD Change', title: 'Change from baseline in 6MWD at Week 24', tE: 0, cE: 0, type: 'SECONDARY' },
@@ -2351,35 +2409,39 @@
                         { shortLabel: 'REVEAL Lite 2', title: 'Change from baseline in REVEAL Lite 2 risk score at Week 24', tE: 0, cE: 0, type: 'SECONDARY' }
                     ],
                     rob: ['low', 'low', 'low', 'low', 'low'],
-                    snippet: 'Source: ClinicalTrials.gov NCT04896008 (ZENITH). Enrollment: 173. Status: COMPLETED. Results posted. Phase 3. High-risk PAH WHO FC III/IV on maximum tolerated background therapy.',
+                    snippet: 'Source: ClinicalTrials.gov NCT04896008 (ZENITH). Enrollment: 172. Status: COMPLETED. Results posted. Phase 3. High-risk PAH WHO FC III/IV on maximum tolerated background therapy. HR 0.24 (0.13-0.45).',
                     sourceUrl: 'https://clinicaltrials.gov/study/NCT04896008',
                     evidence: [
-                        { label: 'Enrollment & Design', source: 'ClinicalTrials.gov NCT04896008 (ZENITH); results posted', text: '173 adults with WHO FC III/IV PAH at high risk of mortality (REVEAL Lite 2 >=9) on maximum tolerated double/triple background therapy randomized 1:1 to sotatercept (n=87) or placebo (n=86). Age 18-75 years. PVR >=5 WU.', highlights: ['173', '87', '86', '1:1', 'REVEAL Lite 2 >=9', 'WHO FC III/IV'] },
-                        { label: 'Primary Outcome (Morbidity/Mortality)', source: 'ClinicalTrials.gov NCT04896008 results; ZENITH 2024', text: 'Time to first confirmed morbidity or mortality event (death, lung transplant, PAH hospitalization >=24h): sotatercept 13/87 (14.9%) vs placebo 33/86 (38.4%). HR 0.36 (95% CI 0.19-0.69; P=0.002). 64% risk reduction in high-risk population.', highlights: ['13', '87', '14.9%', '33', '86', '38.4%', 'HR 0.36', 'P=0.002'] },
-                        { label: 'Overall Survival & Transplant-free Survival', source: 'ClinicalTrials.gov NCT04896008 results; ZENITH 2024', text: 'All-cause mortality: sotatercept 5/87 (5.7%) vs placebo 15/86 (17.4%). Transplant-free survival: 6/87 (6.9%) vs 17/86 (19.8%). First PAH trial to show survival benefit in high-risk population.', highlights: ['5.7%', '17.4%', '6.9%', '19.8%', 'survival benefit'] },
+                        { label: 'Enrollment & Design', source: 'ClinicalTrials.gov NCT04896008 (ZENITH); results posted', text: '172 adults with WHO FC III/IV PAH at high risk of mortality (REVEAL Lite 2 >=9) on maximum tolerated double/triple background therapy randomized 1:1 to sotatercept (n=86) or placebo (n=86). Age 18-75 years. PVR >=5 WU.', highlights: ['172', '86', '86', '1:1', 'REVEAL Lite 2 >=9', 'WHO FC III/IV'] },
+                        { label: 'Primary Outcome (Morbidity/Mortality)', source: 'ClinicalTrials.gov NCT04896008 results; ZENITH 2024', text: 'Time to first confirmed morbidity or mortality event (death, lung transplant, PAH hospitalization >=24h): sotatercept 15/86 (17.4%) vs placebo 47/86 (54.7%). HR 0.24 (95% CI 0.13-0.45; P<0.001). 76% risk reduction in high-risk population.', highlights: ['15', '86', '17.4%', '47', '86', '54.7%', 'HR 0.24', 'P<0.001'] },
+                        { label: 'Overall Survival & Transplant-free Survival', source: 'ClinicalTrials.gov NCT04896008 results; ZENITH 2024', text: 'All-cause mortality: sotatercept 5/86 (5.8%) vs placebo 15/86 (17.4%). Transplant-free survival: 6/86 (7.0%) vs 17/86 (19.8%). First PAH trial to show survival benefit in high-risk population.', highlights: ['5.8%', '17.4%', '7.0%', '19.8%', 'survival benefit'] },
                         { label: 'Functional Improvements', source: 'ClinicalTrials.gov NCT04896008 results; ZENITH 2024', text: '6MWD improvement at Week 24: sotatercept +31.4m vs placebo -12.6m. PVR reduction: consistent with STELLAR. WHO FC improvement: 34.5% vs 15.1%. REVEAL Lite 2 score: median -3 vs 0.', highlights: ['+31.4m', '-12.6m', '34.5%', '15.1%'] }
                     ]
                 }
             },
 
             async init() {
-                // v13.0 migration: read from old keys if new key is empty
-                let saved = localStorage.getItem('rapid_meta_sotatercept_pah_v13_0');
+                // v14.0 migration: read from old keys if new key is empty
+                let saved = localStorage.getItem('rapid_meta_sotatercept_pah_v14_0');
+                if (!saved) {
+                    const old13 = localStorage.getItem('rapid_meta_sotatercept_pah_v13_0');
+                    if (old13) { saved = old13; localStorage.setItem('rapid_meta_sotatercept_pah_v14_0', old13); }
+                }
                 if (!saved) {
                     const old12 = localStorage.getItem('rapid_meta_sotatercept_pah_v12_0');
-                    if (old12) { saved = old12; localStorage.setItem('rapid_meta_sotatercept_pah_v13_0', old12); }
+                    if (old12) { saved = old12; localStorage.setItem('rapid_meta_sotatercept_pah_v14_0', old12); }
                 }
                 if (!saved) {
                     const old11 = localStorage.getItem('rapid_meta_sotatercept_pah_v11_0');
-                    if (old11) { saved = old11; localStorage.setItem('rapid_meta_sotatercept_pah_v13_0', old11); }
+                    if (old11) { saved = old11; localStorage.setItem('rapid_meta_sotatercept_pah_v14_0', old11); }
                 }
                 if (!saved) {
                     const old10 = localStorage.getItem('rapid_meta_sotatercept_pah_v10_0');
-                    if (old10) { saved = old10; localStorage.setItem('rapid_meta_sotatercept_pah_v13_0', old10); }
+                    if (old10) { saved = old10; localStorage.setItem('rapid_meta_sotatercept_pah_v14_0', old10); }
                 }
                 if (!saved) {
                     const old93 = localStorage.getItem('rapid_meta_sotatercept_pah_v9_3');
-                    if (old93) { saved = old93; localStorage.setItem('rapid_meta_sotatercept_pah_v13_0', old93); }
+                    if (old93) { saved = old93; localStorage.setItem('rapid_meta_sotatercept_pah_v14_0', old93); }
                 }
                 if (saved) {
                     try {
@@ -2395,7 +2457,7 @@
                         if (sanitizedLoadedState) this.save();
                     } catch (e) {
                         console.error('Corrupted localStorage, resetting:', e);
-                        localStorage.removeItem('rapid_meta_sotatercept_pah_v13_0');
+                        localStorage.removeItem('rapid_meta_sotatercept_pah_v14_0');
                         showToast('State was corrupted and has been reset.');
                     }
                 }
@@ -2722,6 +2784,11 @@
                 }
                 // v13.0: Render stored version diff on load
                 this.renderVersionDiff();
+                // Show NMA tab if configured
+                if (NMA_CONFIG) {
+                    const nmaBtn = document.getElementById('btn-tab-nma');
+                    if (nmaBtn) nmaBtn.style.display = '';
+                }
             },
 
             snapshotVersion(trigger = 'manual') {
@@ -2828,7 +2895,7 @@
                 showToast('Version log exported.');
             },
 
-            save() { try { localStorage.setItem('rapid_meta_sotatercept_pah_v13_0', JSON.stringify(this.state)); } catch(e) { if (e.name === 'QuotaExceededError') showToast('Storage quota exceeded. Clear old version snapshots.'); } },
+            save() { try { localStorage.setItem('rapid_meta_sotatercept_pah_v14_0', JSON.stringify(this.state)); } catch(e) { if (e.name === 'QuotaExceededError') showToast('Storage quota exceeded. Clear old version snapshots.'); } },
             getReviewerId() {
                 const id = String(this.state.reviewerId ?? '').trim();
                 if (id) return id;
@@ -2963,7 +3030,7 @@
             },
             exportReviewPack() {
                 const payload = {
-                    app: 'RapidMeta sotatercept v13.0',
+                    app: 'RapidMeta sotatercept v14.0',
                     exportedAt: new Date().toISOString(),
                     reviewerId: String(this.state.reviewerId ?? ''),
                     state: this.state
@@ -3690,6 +3757,7 @@
                 if (id === 'extract') { ExtractEngine.render(); RapidMeta.retranslate(document.getElementById('tab-extract')); }
                 if (id === 'analysis') AnalysisEngine.run();
                 if (id === 'report') { this.renderVersionDiff(); }
+                if (id === 'nma') { NMAEngine.render(); }
             },
             async checkAACT() {
                 const dot = document.getElementById('aact-dot');
@@ -3729,7 +3797,7 @@
                     }
                 }
             },
-            reset() { if(confirm("System Factory Reset?")) { localStorage.removeItem('rapid_meta_sotatercept_pah_v13_0'); localStorage.removeItem('rapid_meta_sotatercept_pah_v12_0'); localStorage.removeItem('rapid_meta_sotatercept_pah_v11_0'); localStorage.removeItem('rapid_meta_sotatercept_pah_v10_0'); localStorage.removeItem('rapid_meta_sotatercept_pah_v9_3'); location.reload(); } },
+            reset() { if(confirm("System Factory Reset?")) { localStorage.removeItem('rapid_meta_sotatercept_pah_v14_0'); localStorage.removeItem('rapid_meta_sotatercept_pah_v13_0'); localStorage.removeItem('rapid_meta_sotatercept_pah_v12_0'); localStorage.removeItem('rapid_meta_sotatercept_pah_v11_0'); localStorage.removeItem('rapid_meta_sotatercept_pah_v10_0'); localStorage.removeItem('rapid_meta_sotatercept_pah_v9_3'); location.reload(); } },
             setBayesPrior(prior) {
                 this.state.bayesPrior = prior;
                 document.querySelectorAll('.prior-btn').forEach(btn => {
@@ -3942,7 +4010,7 @@
                 'Funding Source': 'مصدر التمويل',
                 'Conflicts of Interest': 'تضارب المصالح',
                 'sotatercept for Cardiorenal Outcomes: A Living Systematic Review and Meta-Analysis of Randomized Controlled Trials': 'الفينيرينون لنتائج القلب والكلى: مراجعة منهجية حية وتحليل وصفي للتجارب العشوائية المضبوطة',
-                'v13.0 (Living Protocol': 'الإصدار 13.0 (بروتوكول حي',
+                'v14.0 (Living Protocol': 'الإصدار 14.0 (بروتوكول حي',
                 'auto-updating)': 'تحديث تلقائي)',
                 'Continuous (living review); formal snapshot at each new trial publication': 'مستمر (مراجعة حية)؛ لقطة رسمية عند كل نشر تجربة جديدة',
                 'No external funding (independent academic review)': 'لا تمويل خارجي (مراجعة أكاديمية مستقلة)',
@@ -4440,7 +4508,7 @@
 
                 // Header
                 'RapidMeta': 'RapidMeta',
-                'Precision v13.0': 'الدقة الإصدار 13.0',
+                'Precision v14.0': 'الدقة الإصدار 14.0',
 
                 // Misc
                 'No snapshots yet.': 'لا توجد لقطات بعد.',
@@ -8253,6 +8321,305 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════════════
+        // v14.0: Network Meta-Analysis Engine
+        // Bucher indirect comparisons, league table, P-scores, consistency
+        // ═══════════════════════════════════════════════════════════
+        const NMA_CONFIG = null; // Populated by generator for NMA-enabled apps
+
+        const NMAEngine = {
+            _getConfig() {
+                return NMA_CONFIG ?? RapidMeta.state?.nmaNetwork ?? null;
+            },
+
+            _getTrialEffect(nctId) {
+                const trial = (RapidMeta.state.trials ?? []).find(t => t.id === nctId);
+                const d = trial?.data ?? RapidMeta.realData?.[nctId];
+                if (!d || !d.tN || !d.cN) return null;
+                if (d.publishedHR && d.hrLCI && d.hrUCI) {
+                    const logHR = Math.log(d.publishedHR);
+                    const se = (Math.log(d.hrUCI) - Math.log(d.hrLCI)) / 3.92;
+                    return { logEffect: logHR, se, measure: 'HR', n: d.tN + d.cN };
+                }
+                if (d.tE > 0 || d.cE > 0) {
+                    const tE = d.tE + 0.5, tN = d.tN + 1, cE = d.cE + 0.5, cN = d.cN + 1;
+                    const logRR = Math.log((tE / tN) / (cE / cN));
+                    const se = Math.sqrt(1/tE - 1/tN + 1/cE - 1/cN);
+                    return { logEffect: logRR, se, measure: 'RR', n: d.tN + d.cN };
+                }
+                return null;
+            },
+
+            _poolEffects(trialIds) {
+                const effects = trialIds.map(id => this._getTrialEffect(id)).filter(Boolean);
+                if (effects.length === 0) return null;
+                if (effects.length === 1) return effects[0];
+                const weights = effects.map(e => 1 / (e.se * e.se));
+                const wSum = weights.reduce((a, b) => a + b, 0);
+                const logEffect = effects.reduce((s, e, i) => s + weights[i] * e.logEffect, 0) / wSum;
+                const se = Math.sqrt(1 / wSum);
+                const n = effects.reduce((s, e) => s + e.n, 0);
+                return { logEffect, se, measure: effects[0].measure, n };
+            },
+
+            _bucher(effectAC, effectBC) {
+                if (!effectAC || !effectBC) return null;
+                const logEffect = effectAC.logEffect - effectBC.logEffect;
+                const se = Math.sqrt(effectAC.se * effectAC.se + effectBC.se * effectBC.se);
+                return { logEffect, se, measure: effectAC.measure, indirect: true };
+            },
+
+            _getAllPairwise() {
+                const cfg = this._getConfig();
+                if (!cfg) return {};
+                const treatments = cfg.treatments;
+                const results = {};
+                for (let i = 0; i < treatments.length; i++) {
+                    for (let j = i + 1; j < treatments.length; j++) {
+                        const t1 = treatments[i], t2 = treatments[j];
+                        const key = `${t1}|${t2}`;
+                        const comp = (cfg.comparisons ?? []).find(c =>
+                            (c.t1 === t1 && c.t2 === t2) || (c.t1 === t2 && c.t2 === t1));
+                        const trials = comp?.trials ?? [];
+                        const flipped = comp && comp.t1 === t2;
+                        let direct = null;
+                        if (trials.length > 0) {
+                            direct = this._poolEffects(trials);
+                            if (direct && flipped) direct = { ...direct, logEffect: -direct.logEffect };
+                        }
+                        let indirect = null;
+                        for (const common of treatments) {
+                            if (common === t1 || common === t2) continue;
+                            const compAC = (cfg.comparisons ?? []).find(c =>
+                                (c.t1 === t1 && c.t2 === common) || (c.t1 === common && c.t2 === t1));
+                            const compBC = (cfg.comparisons ?? []).find(c =>
+                                (c.t1 === t2 && c.t2 === common) || (c.t1 === common && c.t2 === t2));
+                            if (!compAC?.trials?.length || !compBC?.trials?.length) continue;
+                            let effAC = this._poolEffects(compAC.trials);
+                            let effBC = this._poolEffects(compBC.trials);
+                            if (!effAC || !effBC) continue;
+                            if (compAC.t1 === common) effAC = { ...effAC, logEffect: -effAC.logEffect };
+                            if (compBC.t1 === common) effBC = { ...effBC, logEffect: -effBC.logEffect };
+                            indirect = this._bucher(effAC, effBC);
+                            break;
+                        }
+                        const best = direct ?? indirect ?? null;
+                        results[key] = { direct, indirect, combined: best, t1, t2 };
+                    }
+                }
+                return results;
+            },
+
+            _formatEffect(eff) {
+                if (!eff) return { text: '--', cls: 'nma-ns' };
+                const est = Math.exp(eff.logEffect);
+                const lo = Math.exp(eff.logEffect - 1.96 * eff.se);
+                const hi = Math.exp(eff.logEffect + 1.96 * eff.se);
+                const sig = (lo > 1.0 || hi < 1.0);
+                const cls = sig ? (est < 1 ? 'nma-sig-favor' : 'nma-sig-against') : 'nma-ns';
+                const label = eff.indirect ? ' *' : '';
+                return { text: `${est.toFixed(2)} (${lo.toFixed(2)}-${hi.toFixed(2)})${label}`, cls, est, lo, hi };
+            },
+
+            renderNetwork() {
+                const cfg = this._getConfig();
+                if (!cfg) return;
+                const container = document.getElementById('nma-network-plot');
+                if (!container) return;
+                const treatments = cfg.treatments;
+                const n = treatments.length;
+                const angleStep = (2 * Math.PI) / n;
+                const nodes = treatments.map((t, i) => {
+                    let totalN = 0;
+                    (cfg.comparisons ?? []).forEach(c => {
+                        if (c.t1 === t || c.t2 === t) {
+                            c.trials.forEach(id => {
+                                const eff = this._getTrialEffect(id);
+                                if (eff) totalN += eff.n;
+                            });
+                        }
+                    });
+                    return { name: t, x: Math.cos(i * angleStep), y: Math.sin(i * angleStep), size: Math.max(20, Math.sqrt(totalN) * 2) };
+                });
+                const edges = [];
+                const pairwise = this._getAllPairwise();
+                Object.values(pairwise).forEach(p => {
+                    const i1 = treatments.indexOf(p.t1);
+                    const i2 = treatments.indexOf(p.t2);
+                    if (i1 < 0 || i2 < 0) return;
+                    const isDirect = Boolean(p.direct);
+                    edges.push({ x: [nodes[i1].x, nodes[i2].x, null], y: [nodes[i1].y, nodes[i2].y, null], dash: isDirect ? 'solid' : 'dash', color: isDirect ? '#3b82f6' : '#475569' });
+                });
+                const edgeTraces = edges.map(e => ({ type: 'scatter', mode: 'lines', x: e.x, y: e.y, line: { dash: e.dash, color: e.color, width: 2 }, hoverinfo: 'none', showlegend: false }));
+                const nodeTrace = { type: 'scatter', mode: 'markers+text', x: nodes.map(n => n.x), y: nodes.map(n => n.y), text: nodes.map(n => n.name), textposition: 'top center', textfont: { size: 11, color: '#f1f5f9', family: 'Inter' }, marker: { size: nodes.map(n => n.size), color: nodes.map((n, i) => n.name.toLowerCase() === 'placebo' ? '#475569' : ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4'][i % 6]), line: { width: 2, color: '#1e293b' } }, hoverinfo: 'text', showlegend: false };
+                const layout = { paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', xaxis: { visible: false }, yaxis: { visible: false, scaleanchor: 'x' }, margin: { t: 20, b: 20, l: 20, r: 20 }, height: 380 };
+                Plotly.newPlot(container, [...edgeTraces, nodeTrace], layout, { responsive: true, displayModeBar: false });
+            },
+
+            renderLeagueTable() {
+                const cfg = this._getConfig();
+                if (!cfg) return;
+                const container = document.getElementById('nma-league-container');
+                if (!container) return;
+                const treatments = cfg.treatments;
+                const pairwise = this._getAllPairwise();
+                let html = '<table class="nma-league"><thead><tr><th></th>';
+                treatments.forEach(t => { html += `<th>${escapeHtml(t)}</th>`; });
+                html += '</tr></thead><tbody>';
+                for (let i = 0; i < treatments.length; i++) {
+                    html += `<tr><th style="text-align:left">${escapeHtml(treatments[i])}</th>`;
+                    for (let j = 0; j < treatments.length; j++) {
+                        if (i === j) {
+                            let totalN = 0;
+                            (cfg.comparisons ?? []).forEach(c => {
+                                if (c.t1 === treatments[i] || c.t2 === treatments[i]) {
+                                    c.trials.forEach(id => { const e = this._getTrialEffect(id); if (e) totalN += e.n; });
+                                }
+                            });
+                            html += `<td class="nma-diag">${escapeHtml(treatments[i])}<br><span class="text-[9px]">N=${totalN.toLocaleString()}</span></td>`;
+                        } else {
+                            const key = i < j ? `${treatments[i]}|${treatments[j]}` : `${treatments[j]}|${treatments[i]}`;
+                            const p = pairwise[key];
+                            const eff = p?.combined;
+                            const flipped = i > j;
+                            let display;
+                            if (!eff) {
+                                display = { text: '--', cls: 'nma-ns' };
+                            } else {
+                                const adjEff = flipped ? { ...eff, logEffect: -eff.logEffect } : eff;
+                                display = this._formatEffect(adjEff);
+                            }
+                            html += `<td class="${display.cls}">${display.text}</td>`;
+                        }
+                    }
+                    html += '</tr>';
+                }
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            },
+
+            computePScores() {
+                const cfg = this._getConfig();
+                if (!cfg) return [];
+                const treatments = cfg.treatments;
+                const pairwise = this._getAllPairwise();
+                return treatments.map(t => {
+                    let wins = 0, comparisons = 0;
+                    treatments.forEach(other => {
+                        if (other === t) return;
+                        const key1 = `${t}|${other}`, key2 = `${other}|${t}`;
+                        const p = pairwise[key1] ?? pairwise[key2];
+                        if (!p?.combined) return;
+                        comparisons++;
+                        const eff = pairwise[key1] ? p.combined : { ...p.combined, logEffect: -p.combined.logEffect };
+                        const z = -eff.logEffect / eff.se;
+                        const pVal = 1 / (1 + Math.exp(-0.7056 * z * (1 + 0.044715 * z * z)));
+                        wins += pVal;
+                    });
+                    return { treatment: t, pscore: comparisons > 0 ? wins / comparisons : 0.5 };
+                }).sort((a, b) => b.pscore - a.pscore);
+            },
+
+            renderRankings() {
+                const container = document.getElementById('nma-ranking-container');
+                if (!container) return;
+                const scores = this.computePScores();
+                if (scores.length === 0) { container.innerHTML = '<div class="text-xs text-slate-500 italic">No NMA data available.</div>'; return; }
+                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4'];
+                container.innerHTML = scores.map((s, i) => {
+                    const pct = (s.pscore * 100).toFixed(1);
+                    const barW = Math.max(5, s.pscore * 100);
+                    const color = s.treatment.toLowerCase() === 'placebo' ? '#475569' : colors[i % colors.length];
+                    return `<div class="flex items-center gap-3 mb-3">
+                        <div class="w-40 text-xs font-bold text-slate-300 text-right truncate">${escapeHtml(s.treatment)}</div>
+                        <div class="flex-1 bg-slate-900/50 rounded h-6 overflow-hidden">
+                            <div class="nma-rank-bar h-full" style="width:${barW}%;background:${color}"></div>
+                        </div>
+                        <div class="w-16 text-xs font-mono text-slate-400">${pct}%</div>
+                        <div class="w-8 text-xs font-bold text-slate-500">#${i + 1}</div>
+                    </div>`;
+                }).join('');
+            },
+
+            testConsistency() {
+                const cfg = this._getConfig();
+                if (!cfg) return [];
+                const pairwise = this._getAllPairwise();
+                const results = [];
+                Object.entries(pairwise).forEach(([key, p]) => {
+                    if (!p.direct || !p.indirect) return;
+                    const diff = p.direct.logEffect - p.indirect.logEffect;
+                    const seDiff = Math.sqrt(p.direct.se * p.direct.se + p.indirect.se * p.indirect.se);
+                    const z = Math.abs(diff / seDiff);
+                    const pVal = 2 * (1 - (1 / (1 + Math.exp(-0.7056 * z * (1 + 0.044715 * z * z)))));
+                    results.push({ comparison: key, directEst: Math.exp(p.direct.logEffect), indirectEst: Math.exp(p.indirect.logEffect), diff: Math.exp(diff), pValue: pVal, inconsistent: pVal < 0.10 });
+                });
+                return results;
+            },
+
+            renderConsistency() {
+                const container = document.getElementById('nma-consistency-container');
+                if (!container) return;
+                const results = this.testConsistency();
+                if (results.length === 0) {
+                    container.innerHTML = '<div class="text-xs text-slate-500 italic">No comparisons with both direct and indirect evidence available for consistency testing.</div>';
+                    return;
+                }
+                container.innerHTML = '<table class="nma-league"><thead><tr><th>Comparison</th><th>Direct</th><th>Indirect</th><th>Ratio</th><th>P-value</th><th>Status</th></tr></thead><tbody>' +
+                    results.map(r => {
+                        const cls = r.inconsistent ? 'nma-consistency-fail' : 'nma-consistency-pass';
+                        const [t1, t2] = r.comparison.split('|');
+                        return `<tr>
+                            <td class="text-left">${escapeHtml(t1)} vs ${escapeHtml(t2)}</td>
+                            <td>${r.directEst.toFixed(2)}</td>
+                            <td>${r.indirectEst.toFixed(2)}</td>
+                            <td>${r.diff.toFixed(2)}</td>
+                            <td class="${cls}">${r.pValue.toFixed(3)}</td>
+                            <td class="${cls}">${r.inconsistent ? '<i class="fa-solid fa-xmark mr-1"></i>Inconsistent' : '<i class="fa-solid fa-check mr-1"></i>Consistent'}</td>
+                        </tr>`;
+                    }).join('') + '</tbody></table>';
+            },
+
+            exportLeagueCSV() {
+                const cfg = this._getConfig();
+                if (!cfg) { showToast('No NMA network configured.'); return; }
+                const treatments = cfg.treatments;
+                const pairwise = this._getAllPairwise();
+                let csv = ',' + treatments.join(',') + '\n';
+                for (let i = 0; i < treatments.length; i++) {
+                    csv += treatments[i];
+                    for (let j = 0; j < treatments.length; j++) {
+                        if (i === j) { csv += ',' + treatments[i]; continue; }
+                        const key = i < j ? `${treatments[i]}|${treatments[j]}` : `${treatments[j]}|${treatments[i]}`;
+                        const p = pairwise[key];
+                        const eff = p?.combined;
+                        if (!eff) { csv += ',--'; continue; }
+                        const adjEff = i > j ? { ...eff, logEffect: -eff.logEffect } : eff;
+                        const est = Math.exp(adjEff.logEffect);
+                        csv += ',' + est.toFixed(3);
+                    }
+                    csv += '\n';
+                }
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'nma_league_table.csv'; document.body.appendChild(a); a.click();
+                document.body.removeChild(a); URL.revokeObjectURL(url);
+                showToast('League table exported.');
+            },
+
+            render() {
+                const cfg = this._getConfig();
+                if (!cfg) { showToast('No NMA network configured for this topic.'); return; }
+                this.renderNetwork();
+                this.renderLeagueTable();
+                this.renderRankings();
+                this.renderConsistency();
+                showToast('NMA complete: ' + cfg.treatments.length + ' treatments, ' + (cfg.comparisons ?? []).length + ' comparisons.');
+                addAuditEntry('NMA rendered: ' + cfg.treatments.length + ' treatments');
+            }
+        };
+
         // ===== v11.0: BAYESIAN RANDOM-EFFECTS ENGINE =====
         const BayesianEngine = {
             run(plotData, pLogOR, pSE, tau2) {
@@ -9152,7 +9519,7 @@
                 };
                 const arrow = (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#64748b" stroke-width="1.5" marker-end="url(#prisma-arrowhead)"/>`;
                 const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" class="w-full" role="img" aria-label="PRISMA 2020 flow diagram showing study identification, screening, eligibility, and inclusion stages">
-                    <title>RapidMeta Cardiology | Sotatercept in PAH v13.0</title>
+                    <title>RapidMeta Cardiology | Sotatercept in PAH v14.0</title>
                     <desc>Flow diagram: ${data.totalIdent} records identified, ${data.afterDedup} after deduplication, ${data.excluded} excluded at screening, ${data.included} included in synthesis.</desc>
                     <defs><marker id="prisma-arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/></marker></defs>
                     <text x="10" y="30" fill="#94a3b8" font-size="12" font-weight="bold" font-family="system-ui">IDENTIFICATION</text>
@@ -9489,7 +9856,7 @@
                     '<\/tbody><\/table>' +
                     '<div class="footnotes">' +
                     '<p><strong>GRADE certainty ratings:<\/strong> HIGH = very confident; MODERATE = moderately confident; LOW = limited confidence; VERY LOW = very little confidence.<\/p>' +
-                    '<p><strong>Methods:<\/strong> DerSimonian-Laird random-effects model. ' + confLevel + '% confidence intervals. Generated by RapidMeta v13.0 on ' + new Date().toLocaleDateString() + '.<\/p>' +
+                    '<p><strong>Methods:<\/strong> DerSimonian-Laird random-effects model. ' + confLevel + '% confidence intervals. Generated by RapidMeta v14.0 on ' + new Date().toLocaleDateString() + '.<\/p>' +
                     '<\/div><\/body><\/html>';
                 var blob = new Blob([html], { type: 'application/msword' });
                 var url = URL.createObjectURL(blob);
@@ -9619,16 +9986,16 @@
                 const gradeCsv = [gradeHeader, ...gradeRows.map(r => `${_gesc(r.outcome)},${r.k},${_gesc(r.certainty)},${_gesc(r.relativeEffect)},${r.cerPer1000},${_gesc(r.ardPer1000)},${_gesc(r.plain)}`)].join('\n');
                 files.push({ name: 'grade_profile.csv', content: gradeCsv });
                 files.push({ name: 'audit_log.json', content: JSON.stringify(s.updateLog ?? [], null, 2) });
-                files.push({ name: 'config.json', content: JSON.stringify({ version: 'v13.0', confLevel: s.confLevel, effectMeasure: s.effectMeasure, outcome: s.selectedOutcome, searchQueries: s.protocol }, null, 2) });
+                files.push({ name: 'config.json', content: JSON.stringify({ version: 'v14.0', confLevel: s.confLevel, effectMeasure: s.effectMeasure, outcome: s.selectedOutcome, searchQueries: s.protocol }, null, 2) });
                 const seal = await DataSealEngine.computeSeal();
                 files.push({ name: 'seal.json', content: JSON.stringify({ sha256: seal, timestamp: new Date().toISOString(), dataFile: 'data.csv' }, null, 2) });
-                files.push({ name: 'README.txt', content: 'sotatercept v13.0 Reproducibility Capsule\n\nTo validate:\n1. R: source("validate_R.R") -- requires metafor package\n2. Python: python validate_python.py -- requires numpy\n\ndata.csv contains all included trial data.\nprovenance.json maps each number to its source snippet.\nseal.json contains SHA-256 hash of data.csv for integrity verification.' });
+                files.push({ name: 'README.txt', content: 'sotatercept v14.0 Reproducibility Capsule\n\nTo validate:\n1. R: source("validate_R.R") -- requires metafor package\n2. Python: python validate_python.py -- requires numpy\n\ndata.csv contains all included trial data.\nprovenance.json maps each number to its source snippet.\nseal.json contains SHA-256 hash of data.csv for integrity verification.' });
                 return files;
             },
             _generatePython(included) {
                 const cl = RapidMeta.state.confLevel ?? 0.95;
                 const lines = [
-                    '"""sotatercept v13.0 - Python validation (numpy only, no scipy)"""',
+                    '"""sotatercept v14.0 - Python validation (numpy only, no scipy)"""',
                     'import numpy as np',
                     'import csv, json, math',
                     '',
@@ -10599,7 +10966,7 @@
                 const effectSpec = RapidMeta.resolveEffectMeasure({ trials });
                 if (effectSpec.effective === 'HR') {
                     const hrTrials = trials.filter(t => RapidMeta.trialHasPublishedHR(t));
-                    const rScript = `# RapidMeta v13.0 R-Validation (DL + HKSJ + Bayesian) â€” HR
+                    const rScript = `# RapidMeta v14.0 R-Validation (DL + HKSJ + Bayesian) â€” HR
 library(metafor)
 dat <- data.frame(
   trial = c(${hrTrials.map(t=>`"${escStr(t.data?.name || t.id)}"`).join(',')}),
@@ -10631,7 +10998,7 @@ forest(res_dl, slab=dat$trial, atransf=exp, xlab="Hazard Ratio")`;
                     return;
                 }
                 const emR = effectSpec.effective;
-                const rScript = `# RapidMeta v13.0 R-Validation (DL + HKSJ + Bayesian) — ${emR}
+                const rScript = `# RapidMeta v14.0 R-Validation (DL + HKSJ + Bayesian) — ${emR}
 library(metafor)
 dat <- data.frame(
   trial = c(${trials.map(t=>`"${escStr(t.data?.name || t.id)}"`).join(',')}),
@@ -11626,7 +11993,7 @@ print(res_sub)`;
                 }));
                 return {
                     format: 'rapidmeta-sotatercept-run-artifact',
-                    version: 'v13.0',
+                    version: 'v14.0',
                     generatedAt: new Date().toISOString(),
                     analysisFingerprint: fingerprint,
                     protocolConstraints: {
@@ -12372,7 +12739,7 @@ print(res_sub)`;
                 // Safety: #wr-charts content is entirely app-generated from hardcoded trial data (icon grids + gauge SVGs).
                 // No user-supplied HTML can enter these elements. Stripping script tags as defense-in-depth.
                 const chartHtml = section.querySelector('#wr-charts').innerHTML.replace(new RegExp('<' + 'script[\\s\\S]*?</' + 'script>', 'gi'), '');
-                const printHtml = '<html><head><title>RapidMeta Cardiology | Sotatercept in PAH v13.0</title>'
+                const printHtml = '<html><head><title>RapidMeta Cardiology | Sotatercept in PAH v14.0</title>'
                     + '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">'
                     + '<style>body{font-family:system-ui,sans-serif;background:#fff;color:#1e293b;padding:2rem;margin:0}'
                     + '.wr-icon-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;max-width:200px}'
@@ -12450,7 +12817,7 @@ print(res_sub)`;
                     ? RapidMeta.state.runArtifact
                     : ArtifactEngine.build(r, scope, guardian, concordance, delta, benchmark, RapidMeta.state.runArtifact?.dataSeal ?? null);
                 const payload = {
-                    meta: { app: 'RapidMeta sotatercept', version: 'v13.0', generated: new Date().toISOString(), confLevel: r.confLevel + '%' },
+                    meta: { app: 'RapidMeta sotatercept', version: 'v14.0', generated: new Date().toISOString(), confLevel: r.confLevel + '%' },
                     effectMeasure: RapidMeta.emLabel('short'),
                     pooledResult: { [RapidMeta.emLabel('short')]: r.or, CI: [r.lci, r.uci], I2: r.i2 + '%', HKSJ_CI: [r.hksjLCI, r.hksjUCI], PI: [r.piLCI, r.piUCI], Q_pvalue: r.qPvalue, Egger_pvalue: r.eggerP, FragilityIndex: r.fragIdx, FragilityQuotient: r.fragQuot + '%', Bayesian_CrI: [r.bayesCriLo, r.bayesCriHi], ['P_' + RapidMeta.emLabel('short') + '_lt_1']: r.pORlt1 + '%', TrimFill_k0: r.trimK0, ['TrimFill_adj' + RapidMeta.emLabel('short')]: r.trimAdjOR, Copas_Robust: r.copasRobust, InfoFraction: r.infoFrac + '%' },
                     studies: included.map(t => ({ id: t.id, name: RapidMeta.nctAcronyms[t.id] ?? t.data.name, year: t.data.year, phase: t.data.phase, indication: t.data.group, events_tx: t.data.tE, n_tx: t.data.tN, events_ctrl: t.data.cE, n_ctrl: t.data.cN, rob: t.data.rob, source: t.source })),
@@ -12498,7 +12865,7 @@ print(res_sub)`;
                 const benchmarkRows = benchmark?.available
                     ? benchmark.entries.map(entry => `<tr><td>${escapeHtml(entry.label)}</td><td>${entry.year ?? '--'}</td><td>${escapeHtml(entry.measure)}</td><td>${entry.estimate.toFixed(2)}</td><td>${entry.lci.toFixed(2)}-${entry.uci.toFixed(2)}</td><td>${escapeHtml(entry.alignment)}</td></tr>`).join('')
                     : '';
-                const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RapidMeta Cardiology | Sotatercept in PAH v13.0</title>
+                const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RapidMeta Cardiology | Sotatercept in PAH v14.0</title>
 <style>body{font-family:Georgia,serif;max-width:800px;margin:2rem auto;color:#1e293b;line-height:1.7}table{width:100%;border-collapse:collapse;margin:1rem 0}th,td{border:1px solid #cbd5e1;padding:8px;text-align:left;font-size:13px}th{background:#f1f5f9;font-weight:bold}h1{font-size:1.8rem;border-bottom:3px solid #1e3a8a;padding-bottom:0.5rem}h2{font-size:1.2rem;color:#1e3a8a;margin-top:2rem}.stat{font-family:monospace;font-weight:bold;color:#1e40af;background:#eff6ff;padding:2px 6px;border-radius:4px}.footer{font-size:10px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:1rem;margin-top:3rem}@media print{body{margin:1cm}}</style></head><body>
 <h1>sotatercept in Cardio-Kidney-Metabolic Disease</h1>
 <p><em>Meta-analysis report generated ${escapeHtml(timestamp)}</em></p>
@@ -12541,7 +12908,7 @@ ${deltaRows ? `<table><thead><tr><th>Trial</th><th>Scope</th><th>Registered Prim
 ${benchmark?.available ? `<table><thead><tr><th>Comparator</th><th>Year</th><th>Measure</th><th>Estimate</th><th>95% CI</th><th>Alignment</th></tr></thead><tbody>${benchmarkRows}</tbody></table>` : ''}
 <h2>Included Studies (k=${r.k})</h2>
 <table><thead><tr><th>Trial</th><th>Year</th><th>Phase</th><th>Events/N (Tx)</th><th>Events/N (Ctrl)</th></tr></thead><tbody>${trialRows}</tbody></table>
-<div class="footer">Generated by RapidMeta sotatercept v13.0. Data seal reflects the current outcome-scoped analysis set.</div>
+<div class="footer">Generated by RapidMeta sotatercept v14.0. Data seal reflects the current outcome-scoped analysis set.</div>
 </body></html>`;
                 const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
@@ -12569,7 +12936,7 @@ ${benchmark?.available ? `<table><thead><tr><th>Comparator</th><th>Year</th><th>
                     const hrLo = hrIncluded.map(t => t.data.pubHR_LCI).join(', ');
                     const hrHi = hrIncluded.map(t => t.data.pubHR_UCI).join(', ');
                     const pyScript = `#!/usr/bin/env python3
-"""RapidMeta v13.0 - Python validation script for sotatercept meta-analysis."""
+"""RapidMeta v14.0 - Python validation script for sotatercept meta-analysis."""
 import numpy as np
 from scipy import stats
 
@@ -12624,7 +12991,7 @@ except ImportError:
                     return;
                 }
                 const pyScript = `#!/usr/bin/env python3
-"""RapidMeta v13.0 - Python validation script for sotatercept meta-analysis."""
+"""RapidMeta v14.0 - Python validation script for sotatercept meta-analysis."""
 import numpy as np
 from scipy import stats
 
@@ -13131,7 +13498,7 @@ except ImportError:
                 '<p>' + escapeHtml(methods) + '</p></div>' +
                 '<div><div class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-2">Results</div>' +
                 '<p>' + escapeHtml(results) + '</p></div>' +
-                '<div class="text-[9px] text-slate-600 italic mt-2">Generated by RapidMeta v13.0. Verify all numbers against the analysis output before submission.</div>';
+                '<div class="text-[9px] text-slate-600 italic mt-2">Generated by RapidMeta v14.0. Verify all numbers against the analysis output before submission.</div>';
         }
 
         function copyManuscriptText() {

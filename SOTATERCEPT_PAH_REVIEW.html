@@ -2104,7 +2104,7 @@
             state: {
                 protocol: { pop: 'Adults with WHO Group 1 PAH on stable background therapy', int: 'Sotatercept (activin signaling inhibitor, ActRIIA-Fc)', comp: 'Placebo', out: '6-Minute Walk Distance change; clinical worsening composite; PVR change', subgroup: 'Background therapy class, WHO FC, newly diagnosed vs established', query: '', rctOnly: true, post2015: true },
                 trials: [], activeTab: 'protocol', results: null, showExcluded: false, screenFilter: 'all',
-                confLevel: 0.95, effectMeasure: 'RR', updateLog: [], bayesPrior: 'informative', versionSnapshots: [],
+                confLevel: 0.95, effectMeasure: 'HR', updateLog: [], bayesPrior: 'informative', versionSnapshots: [],
                 searchLog: [], reviewerId: '', reviewLock: { owner: '', ts: '' }, mergeConflicts: [],
                 guardianSnapshot: null, concordanceSnapshot: null, deltaSnapshot: null, benchmarkSnapshot: null, runArtifact: null, ctgovHistoryPack: null
             },
@@ -2444,6 +2444,7 @@
                 'NCT04576988': {
                     name: 'STELLAR', phase: 'III', year: 2023,
                     tE: 9, tN: 163, cE: 42, cN: 161, group: 'Established PAH (on background Rx)',
+                    publishedHR: 0.16, hrLCI: 0.08, hrUCI: 0.35,
                     allOutcomes: [
                         { shortLabel: '6MWD Change', title: 'Change from baseline in 6-Minute Walk Distance at Week 24 (primary, continuous)', tE: 0, cE: 0, type: 'PRIMARY' },
                         { shortLabel: 'Clinical Worsening', title: 'Death or first clinical worsening event at 24 weeks', tE: 9, cE: 42, type: 'SECONDARY' },
